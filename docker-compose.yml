@@ -1,0 +1,14 @@
+version: '3.9'
+services:
+  postgresql:
+    image: postgres:12
+    container_name: postgresql
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: workPal
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data:/var/lib/postgresql/data
+    restart: always
