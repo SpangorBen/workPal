@@ -1,10 +1,11 @@
 package main.java.com.workPal.model;
 
-public class User {
+public class User implements Entity<Integer> {
     private Integer id;
     private String name;
     private String email;
     private String password;
+    private String encodedSalt;
 
     public User() {
     }
@@ -15,15 +16,21 @@ public class User {
         this.email = email;
     }
 
-    public int getId() {
+    @Override
+    public Integer getId() {
         return id;
     }
 
-    public String getUserName() {
+    @Override
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public String getName() {
         return name;
     }
 
-    public void setUserName(String userName) {
+    public void setName(String userName) {
         this.name = userName;
     }
 
@@ -41,5 +48,13 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getEncodedSalt() {
+        return encodedSalt;
+    }
+
+    public void setEncodedSalt(String encodedSalt) {
+        this.encodedSalt = encodedSalt;
     }
 }

@@ -1,52 +1,47 @@
 package main.java.com.workPal.repository.impl;
 
 import main.java.com.workPal.config.DatabaseConnection;
+import main.java.com.workPal.dto.UserDto;
 import main.java.com.workPal.model.User;
 import main.java.com.workPal.repository.interfaces.UserRepositoryInterface;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.Optional;
 
-public class UserRepository implements UserRepositoryInterface {
+public class UserRepository extends PostgresRepository<User, UserDto, Integer> implements UserRepositoryInterface {
 
-    @Override
-    public Optional<User> findUserById(Long id) {
-        System.out.println("User found");
-        return Optional.empty();
+    public UserRepository() {
+        super("users");
     }
 
     @Override
-    public Optional<User> findUserByEmail(String email) {
-        System.out.println("User found");
-        return Optional.empty();
+    protected UserDto mapRowToDto(ResultSet resultSet, Class<UserDto> dtoClass) throws SQLException {
+        UserDto dto = new UserDto();
+        dto.setId(resultSet.getInt("id"));
+        dto.setName(resultSet.getString("name"));
+        dto.setEmail(resultSet.getString("email"));
+        dto.setPassword(resultSet.getString("password"));
+        dto.setEncodedSalt(resultSet.getString("encodedSalt"));
+        return dto;
     }
 
     @Override
-    public User saveUser(User user) {
-        String sql = "INSERT INTO user (name, email, password) VALUES (?, ?, ?)";
+    protected void setParametersForSaveOrUpdate(PreparedStatement statement, UserDto dto) throws SQLException {
+        statement.setString(1, dto.getName());
+        statement.setString(2, dto.getPassword());
+        statement.setString(3, dto.getEmail());
+        statement.setString(4, dto.getEncodedSalt());
+    }
 
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-                pstmt.setString(1, user.getUserName());
-                pstmt.setString(2, user.getEmail());
-                pstmt.setString(3, user.getPassword());
-                pstmt.executeUpdate();
 
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return null;
+    @Override
+    public Optional<UserDto> findById(Integer id, String idColumnName, Class<UserDto> dtoClass, Connection connection) throws SQLException {
+        return super.findById(id, idColumnName, dtoClass, connection);
     }
 
     @Override
-    public void updateUser(User user) {
-        System.out.println("User updated");
+    public void deleteById(Integer id, String idColumnName, Connection connection) throws SQLException {
+        super.deleteById(id, idColumnName, connection);
     }
 
-    @Override
-    public void deleteUserById(Long id) {
-        System.out.println("User deleted");
-    }
 }

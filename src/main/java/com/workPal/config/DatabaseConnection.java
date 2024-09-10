@@ -30,10 +30,8 @@ public class DatabaseConnection {
                         String username = properties.getProperty("username");
                         String password = properties.getProperty("password");
 
-                        // Load the JDBC driver
                         Class.forName(driver);
 
-                        // Establish the connection
                         connection = DriverManager.getConnection(url, username, password);
                     } catch (IOException | ClassNotFoundException | SQLException e) {
                         throw new RuntimeException("Error connecting to the database: " + e.getMessage(), e);
