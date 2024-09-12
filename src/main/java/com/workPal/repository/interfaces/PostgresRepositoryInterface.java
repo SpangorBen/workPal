@@ -10,4 +10,5 @@ public interface PostgresRepositoryInterface<T, D, ID> {
     D save(T entity, Class<D> dtoClass, Connection connection);
     Optional<D> findById(ID id, String idColumnName, Class<D> dtoClass, Connection connection) throws SQLException;
     void deleteById(ID id, String idColumnName, Connection connection) throws SQLException;
+    void update(D dtoClass, Connection connection) throws SQLException;
 }

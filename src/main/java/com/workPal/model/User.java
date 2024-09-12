@@ -6,14 +6,15 @@ public class User implements Entity<Integer> {
     private String email;
     private String password;
     private String encodedSalt;
+    private UserRole role;
 
     public User() {
     }
 
     public User(String name, String email, String password) {
         this.name = name;
-        this.password = password;
         this.email = email;
+        this.password = password;
     }
 
     @Override
@@ -56,5 +57,13 @@ public class User implements Entity<Integer> {
 
     public void setEncodedSalt(String encodedSalt) {
         this.encodedSalt = encodedSalt;
+    }
+
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
     }
 }

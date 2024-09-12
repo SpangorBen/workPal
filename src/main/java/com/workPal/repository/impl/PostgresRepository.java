@@ -2,7 +2,10 @@ package main.java.com.workPal.repository.impl;
 
 import main.java.com.workPal.config.DatabaseConnection;
 import main.java.com.workPal.dto.Dto;
+import main.java.com.workPal.model.Admin;
 import main.java.com.workPal.model.Entity;
+import main.java.com.workPal.model.Manager;
+import main.java.com.workPal.model.Member;
 import main.java.com.workPal.repository.interfaces.PostgresRepositoryInterface;
 
 import java.sql.*;
@@ -71,7 +74,8 @@ public abstract class PostgresRepository<T extends Entity, D extends Dto, ID> im
         D dto = mapEntityToDto(entity, dtoClass);
         String[] columns = dto.getAttributes();
         String questionMarks = String.join(", ", java.util.Collections.nCopies(columns.length, "?"));
-        String sql = "INSERT INTO " + tableName + " (" + String.join(", ", columns) + ") VALUES (" + questionMarks + ")";
+        String targetTable = getTargetTableName(entity);
+        String sql = "INSERT INTO " + targetTable + " (" + String.join(", ", columns) + ") VALUES (" + questionMarks + ")";
 
         try (PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -79,7 +83,7 @@ public abstract class PostgresRepository<T extends Entity, D extends Dto, ID> im
 
             int rowsAffected = statement.executeUpdate();
             if (rowsAffected == 0) {
-                throw new SQLException("Creating " + tableName + " failed, no rows affected.");
+                throw new SQLException("Creating " + targetTable + " failed, no rows affected.");
             }
 
             try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
@@ -87,14 +91,37 @@ public abstract class PostgresRepository<T extends Entity, D extends Dto, ID> im
                     ID generatedId = (ID) generatedKeys.getObject(1);
                     entity.setId(generatedId);
                 } else {
-                    throw new SQLException("Creating " + tableName + " failed, no ID obtained.");
+                    throw new SQLException("Creating " + targetTable + " failed, no ID obtained.");
                 }
             }
 
             return dto;
         } catch (SQLException e) {
-            throw new RuntimeException("Error saving " + tableName + ": " + e.getMessage(), e);
+            throw new RuntimeException("Error saving " + targetTable + ": " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public void update(D dto, Connection connection) throws SQLException {
+        String[] columns = dto.getAttributes();
+        String setClause = String.join(" = ?, ", columns) + " = ?";
+        String sql = "UPDATE " + tableName + " SET " + setClause + " WHERE id = ?";
+
+        System.out.println("SQL: " + sql);
+
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            setParametersForSaveOrUpdate(statement, dto);
+            statement.setObject(columns.length + 1, dto.getId());
+
+            int rowsAffected = statement.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new SQLException("Updating " + tableName + " failed, no rows affected.");
+            }
+
+        } catch (SQLException e) {
+            throw new SQLException("Error updating " + tableName + ": " + e.getMessage(), e);
+        }
+
     }
 
     @Override
@@ -115,6 +142,17 @@ public abstract class PostgresRepository<T extends Entity, D extends Dto, ID> im
     }
 
 
+    private String getTargetTableName(T entity) {
+        if (entity instanceof Member) {
+            return "members";
+        } else if (entity instanceof Admin) {
+            return "admins";
+        } else if (entity instanceof Manager) {
+            return "managers";
+        } else {
+            return "users";
+        }
+    }
 
 
 }
