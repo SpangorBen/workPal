@@ -36,6 +36,9 @@ Welcome to WorkPal — the all-in-one platform designed to make managing and usi
 - **Design Patterns:** Singleton, Repository Pattern, Service Layer, DTO, MVC.
 - **Architecture:** Layered with strong data validation.
 
+## ⚙️ Quick Start
+Clone the repository or download the source files. Import the project into your preferred Java IDE (e.g., IntelliJ IDEA, Eclipse). Compile and run the project.
+
 ## 📂 Project Structure
 ```plaintext
 src/
@@ -52,6 +55,3 @@ src/
     │   └── utils/        
     │
     └── resources/
-
-## ⚙️ Quick Start
-Clone the repository or download the source files. Import the project into your preferred Java IDE (e.g., IntelliJ IDEA, Eclipse). Compile and run the project.
